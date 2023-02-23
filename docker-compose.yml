@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+#  lenas:
+#    build: .
+#    ports:
+#      - "8000:8000"
+  food_db:
+    image: postgres:11-alpine
+    restart: unless-stopped
+    container_name: food.postgres
+    env_file:
+      - .env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  minio:
+    image: bitnami/minio:latest
+    container_name: food.minio
+    ports:
+      - 9000:9000
+      - 9001:9001
+    environment:
+#      - MINIO_ACCESS_KEY=access-key
+#      - MINIO_SECRET_KEY=secret-key
+      - MINIO_ROOT_USER=user
+      - MINIO_ROOT_PASSWORD=password
+    volumes:
+      - minio-data:/data
+#    command: server /export
+
+#  create_buckets:
+#    image: minio/mc
+#    depends_on:
+#      - minio
+#    entrypoint: >
+#      /bin/sh -c "
+#      apk add nc &&
+#      while ! nc -z minio 9000; do echo 'Wait minio to startup...' && sleep 0.1; done; sleep 5 &&
+#      /usr/bin/mc config host add myminio http://minio:9000 access-key secret-key;
+#      /usr/bin/mc mb myminio/my-local-bucket;
+#      /usr/bin/mc policy download myminio/my-local-bucket;
+#      exit 0;
+#      "
+
+volumes:
+  postgres-data:
+  minio-data:
